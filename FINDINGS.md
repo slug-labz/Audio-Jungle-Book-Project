@@ -1067,3 +1067,99 @@ problem** — record shared contexts across sites, or use a second-order-aware t
 something representation surgery fixes after the fact.
 
 Data `results/out_site/`; code `experiments/site/`.
+
+---
+
+# ITERATION 16 — we built the tool, and it immediately corrected the paper
+
+*18 Aug 2026. Two things happened: `leakcheck` exists, and the first real dataset we pointed it at
+turned up a defect in a number that is currently in Paper A's abstract.*
+
+## The tool
+
+`leakcheck/` — pip-installable, two dependencies (numpy, scikit-learn), no GPU, no model. It takes
+`(X, y, groups)` and reports the three numbers this project has been reporting by hand since
+iteration 7:
+
+```
+leakcheck audit embeddings.npy --meta clips.csv --label context --group animal_id
+```
+
+| | |
+|---|---|
+| honest | task accuracy, whole groups held out |
+| shuffled | task accuracy, random split |
+| identity | how well the same features recover the group |
+
+Plus, because we kept getting caught by them ourselves: a permutation null **at the automatically
+chosen unit** (within-group when the label varies inside a group, group-level when it does not); a
+bootstrap interval over **groups, not clips**; per-group scores; and design diagnostics that run
+before any model is fitted.
+
+`leakcheck erase` runs LEACE / INLP / a random-projection control with the eraser **re-fitted inside
+every fold** — the protocol trap from iteration 15 is now impossible to fall into by accident — and
+reports two numbers a linear probe alone would hide:
+
+- identity on **groups the eraser never saw** (does the transform transfer, or did it memorise?)
+- identity under an **RBF probe** (is the leak second-order, i.e. iteration 15's finding?)
+
+Run against our own pig data it independently reproduces iteration 15: LEACE at **rank 5**, lab
+identity 0.541 → 0.242 in-sample, task 0.436 → 0.456. And it adds a result we had not measured:
+**on labs the eraser never saw, identity is 0.773.** The transform memorises the training labs'
+means; it does not remove a lab axis. Combined with the RBF probe recovering 0.661, the verdict line
+reads *"LINEAR AND IN-SAMPLE ONLY — do not ship this as invariance,"* which is the correct thing for
+a tool to say about our own best method.
+
+21 tests, all passing, including one that fails if imputation ever stops being fold-local.
+
+## What it found in ninety seconds: the pig feature table has a hole
+
+The design diagnostics flagged **700 rows with no features at all** — every one of the 18 published
+measurements absent. They are:
+
+- all from **NMBU** (51% of that lab's 1,381 clips)
+- all labelled **negative valence**, with no positives among them
+- after mean imputation, **one identical constant vector**, 700 times
+
+The paper says the corpus's own feature set "scores below chance (0.386) once a lab is held out."
+That number reproduces exactly. But it is produced by imputing 700 clips the published feature table
+simply does not cover, and all of them carry one label.
+
+Recomputed with `experiments/audit/audit.py` itself, same estimator, same protocol:
+
+| | held-out lab | random | inflation | identity | n |
+|---|---|---|---|---|---|
+| as published | **0.386** | 0.575 | +0.189 | 0.513 | 5,031 |
+| 700 empty rows dropped | **0.537** | 0.745 | **+0.208** | 0.650 | 4,331 |
+
+**The below-chance claim does not survive.** 0.537 is at chance, not below it, so "the mapping
+inverts between labs" is not supported — the supportable claim is that this feature set retains *no*
+cross-lab valence signal.
+
+**The leakage claim gets stronger.** Inflation rises from +0.189 to +0.208, and the random-split
+score rises from 0.575 to 0.745. Removing the degenerate block makes the paper's actual thesis
+cleaner, not weaker.
+
+Paper A updated: abstract, contribution (3), the §4.2 paragraph, and a second table row marked
+`†`. Provenance in `results/out_audit/pig_missing_features.json`.
+
+## Why this is the third-most-useful thing that happened this week
+
+The check that caught it is four lines of numpy and runs before any model is fitted. We have been
+staring at this dataset since 15 August, across fifteen iterations, and did not look. That is the
+argument for the tool existing: not that the analysis is clever, but that the cheap checks only get
+run when something runs them for you.
+
+It also generalises. `leakcheck` now warns when **missingness itself predicts the label** — Cramér's
+V of 0.21 on this corpus. If a model can tell which extractions failed, and failure correlates with
+the label, it can score without hearing anything.
+
+## Related: what ESP shipped in May
+
+Earth Species published *"From What to Who?"* (5 May 2026): BirdAVES adapted into a 173-way
+individual classifier for zebra finches, producing "who-sang-when" timelines. The post does not state
+the split protocol. This is the same quantity we measure as `identity` — for them a capability, for
+us the contaminant. Both readings are correct and they are the same number, which is a better framing
+for the outreach email than anything we had.
+
+Code `leakcheck/`; tests `leakcheck/tests/`; report cards write to HTML, Markdown or JSON.

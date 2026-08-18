@@ -67,6 +67,21 @@ learned "this barn" instead of "this pig is in pain," it will be confidently wro
 identify the *animal*, next to how well they identify the *behaviour*. If the first number is high,
 the second one is borrowing from it.
 
+That line is now a tool. **[`leakcheck`](leakcheck/)** takes your features, your labels and one
+column saying which animal or site each clip came from, and reports all three numbers plus the
+things people forget to check:
+
+```bash
+pip install "git+https://github.com/slug-labz/Audio-Jungle-Book-Project.git#subdirectory=leakcheck"
+leakcheck demo
+leakcheck audit embeddings.npy --meta clips.csv --label context --group animal_id
+```
+
+Two dependencies, no GPU, no model downloads. `--fail-over 0.05` exits non-zero, so it can sit in CI
+and fail a pull request that reintroduces a shuffled split. The first real dataset we pointed it at
+was our own, and it found a defect in a number that was in our paper's abstract — see
+[FINDINGS.md](FINDINGS.md) iteration 16.
+
 ---
 
 ## How we did it
@@ -92,6 +107,7 @@ actually *in* the representation.
 
 ```
 FINDINGS.md              every result, every control, and what got corrected
+leakcheck/               the tool: pip-installable leakage audit for any (features, labels, groups)
 paper/                   the write-up in progress + LaTeX
 experiments/
   context_probe/         the audit: encoders, cross-species, controls, kill-tests

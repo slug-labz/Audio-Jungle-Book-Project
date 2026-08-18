@@ -1,0 +1,20 @@
+{
+  "what": "Pig acoustic18 row, recomputed with experiments/audit/audit.py three_numbers(style='pig')",
+  "found_by": "leakcheck design diagnostics (missing-feature check), 2026-08-18",
+  "issue": "the 18-feature table published with the Soundwel corpus covers 4331 of 5031 clips; for 700 clips every feature is absent. All 700 are NMBU (51% of that lab) and all carry the negative label, so under mean imputation they become one constant vector with a single label.",
+  "as_published": {
+    "heldout": 0.3864,
+    "random": 0.5754,
+    "inflation": 0.189,
+    "identity": 0.513,
+    "n": 5031
+  },
+  "700_dropped": {
+    "heldout": 0.5371,
+    "random": 0.7449,
+    "inflation": 0.2078,
+    "identity": 0.6504,
+    "n": 4331
+  },
+  "conclusion": "the below-chance claim is an artefact of imputing rows the feature table does not cover; the leakage claim is unaffected and slightly stronger (+0.189 -> +0.208)"
+}

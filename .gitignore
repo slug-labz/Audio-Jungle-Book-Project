@@ -48,3 +48,9 @@ credentials*
 
 # private: novelty/competitive analysis — strategy, not results
 paper/RELATED_WORK.md
+
+# ---- packaging ----
+*.egg-info/
+build/
+dist/
+.pytest_cache/

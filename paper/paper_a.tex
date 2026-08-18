@@ -39,8 +39,9 @@ Within a corpus, the feature set that leaks less identity inflates less (partial
 $p{=}7\times10^{-11}$); across corpora we do not detect this relationship ($r{=}0.221$, $n{=}12$).
 Two consequences are concrete: on pig valence under held-out-lab evaluation, 88 classic acoustic
 descriptors match a self-supervised speech encoder (0.669 vs.\ 0.660) while leaking less identity,
-erasing a 6-point random-split lead; and the corpus's own published feature set scores below chance
-(0.386) once a lab is held out. The failure extends to uncertainty quantification: conformal
+erasing a 6-point random-split lead; and the corpus's own published feature set collapses to chance
+once a lab is held out (0.386 as distributed, 0.537 once the 700 clips its feature table does not
+cover are excluded) against 0.575--0.745 on a random split. The failure extends to uncertainty quantification: conformal
 prediction at $\alpha{=}0.10$ returns on-target marginal coverage (0.89--0.90) while the worst
 individual receives 0.412, and the group-conditional remedy is unavailable by construction under a
 group-disjoint split. We quantify the labelling budget that repairs each failure and recommend
@@ -72,8 +73,8 @@ bioacoustics by \citet{colonna2016} and \citet{ghani2026}. What is missing is a 
 \paragraph{Contributions.}
 (1)~A four-corpus, six-feature-set audit under one honest protocol (\S\ref{sec:audit}).
 (2)~The identity--inflation relationship, scoped: within-corpus yes, cross-corpus not detected.
-(3)~An unexpectedly strong simple baseline, and a published feature set that falls below chance under
-site shift.
+(3)~An unexpectedly strong simple baseline, and a published feature set that collapses to chance
+under site shift.
 (4)~A control showing a widely used dataset's context label is partly predictable from the
 \emph{background} alone.
 (5)~A channel stress test: the context axis is 1.4--4.2$\times$ more robust than identity
@@ -159,8 +160,14 @@ Dogs & duration only & 0.341 & 0.360 & $+$0.018 & 0.222 \\
 Pigs & WavLM & 0.660 & 0.883 & $+$0.223 & 0.938 \\
 Pigs & eGeMAPS & \textbf{0.669} & 0.823 & $+$0.153 & 0.865 \\
 Pigs & published 18 feats & 0.386 & 0.575 & $+$0.189 & 0.513 \\
+Pigs & published 18 feats$^{\dagger}$ & 0.537 & 0.745 & $+$0.208 & 0.650 \\
 \bottomrule
 \end{tabular}
+
+\vspace{2pt}
+{\footnotesize $^{\dagger}$Same features and protocol, with the 700 clips omitted whose every
+feature is absent from the published table (see \S\ref{sec:baseline}). Removing them raises the
+held-out-lab score above chance and \emph{increases} the inflation.}
 \end{table}
 
 Inflation ranges from $+$0.099 to $+$0.242 and is present in every dataset and every feature set,
@@ -179,7 +186,7 @@ the honest one ($r{=}0.509$), as the leakage account requires.
 is $r{=}0.221$ ($p{=}0.489$). At $n{=}12$ this test has roughly 15\% power, so we state that we
 \emph{do not detect} a cross-corpus relationship, not that none exists.
 
-\subsection{An unexpectedly strong simple baseline}
+\subsection{An unexpectedly strong simple baseline}\label{sec:baseline}
 
 On pig valence under held-out-lab evaluation eGeMAPS scores 0.669 and WavLM 0.660, while eGeMAPS
 leaks less identity (0.865 vs.\ 0.938). Under a random split WavLM appears clearly ahead (0.883 vs.\
@@ -190,9 +197,17 @@ work---\citet{tang2023} find SSL representations ahead of eGeMAPS in cross-langu
 recognition---so this is domain-specific, not a general claim about feature families.
 
 Separately, the 18 features published with the pig corpus score 0.386 under held-out-lab
-evaluation---below the 0.500 chance level---indicating the feature-to-valence mapping partly inverts
-between labs. Our re-analysis uses a linear probe; the original study used other classifiers and did
-not claim cross-lab generalisation. This is a reframing under a different protocol, not a refutation.
+evaluation---below the 0.500 chance level---against 0.575 on a random split. That below-chance figure
+is not robust, and the reason is worth stating. The published feature table covers 4{,}331 of the
+5{,}031 clips; for the remaining 700, every one of the 18 measurements is absent. All 700 are from a
+single lab (NMBU, 51\% of its clips) and all carry the negative label, so under mean imputation they
+become a single constant vector with one label attached. Excluding them, the same features and the
+same protocol give 0.537 held-out-lab against 0.745 on a random split: at chance rather than below
+it, and with inflation rising from $+$0.189 to $+$0.208. We report both rows. The claim the data
+supports is that this feature set retains no cross-lab valence signal, not that its mapping inverts;
+the leakage result, which is this paper's subject, is unaffected and slightly strengthened. Our
+re-analysis uses a linear probe; the original study used other classifiers and did not claim cross-lab
+generalisation. This is a reframing under a different protocol, not a refutation.
 
 \subsection{The label can be predicted from the background}
 

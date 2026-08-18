@@ -1,0 +1,239 @@
+<title>How We Got Here</title>
+<style>
+:root{--bg:#EFF2F3;--surface:#FBFCFC;--surface-2:#E4EAEB;--ink:#0F1A1C;--ink-2:#42565A;--ink-3:#6C8084;--rule:#CBD6D8;--rule-soft:#DDE5E6;--accent:#9A5205;--cyan:#0A626D;--mag:#8A3459;--ok:#2C6349;--ok-bg:#DCEBE3;--bad-bg:#F2DEE7;--warn:#7E5A0C;--warn-bg:#F0E7D0;--dim:#5C6E71;--dim-bg:#E1E7E8;--shadow:0 1px 2px rgba(15,26,28,.06),0 8px 24px -16px rgba(15,26,28,.28);--mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,monospace;--serif:Charter,"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;--measure:68ch;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0A1113;--surface:#111A1D;--surface-2:#162226;--ink:#E7EEEF;--ink-2:#A5B7BA;--ink-3:#78898D;--rule:#243337;--rule-soft:#1B282B;--accent:#F0AA3E;--cyan:#4FC7CE;--mag:#E58BB0;--ok:#6ECB99;--ok-bg:#163024;--bad-bg:#33202A;--warn:#E0B357;--warn-bg:#2E2617;--dim:#8B9C9F;--dim-bg:#1A2427;--shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -16px rgba(0,0,0,.8);color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0A1113;--surface:#111A1D;--surface-2:#162226;--ink:#E7EEEF;--ink-2:#A5B7BA;--ink-3:#78898D;--rule:#243337;--rule-soft:#1B282B;--accent:#F0AA3E;--cyan:#4FC7CE;--mag:#E58BB0;--ok:#6ECB99;--ok-bg:#163024;--bad-bg:#33202A;--warn:#E0B357;--warn-bg:#2E2617;--dim:#8B9C9F;--dim-bg:#1A2427;--shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -16px rgba(0,0,0,.8);color-scheme:dark}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--serif);font-size:17px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:940px;margin:0 auto;padding:0 clamp(16px,4vw,36px)}.col{max-width:var(--measure)}
+h1,h2,h3{text-wrap:balance;margin:0;line-height:1.15;font-weight:600}h1{font-size:clamp(2.1rem,5.5vw,3.4rem);letter-spacing:-.022em}h2{font-size:clamp(1.35rem,3vw,1.8rem);letter-spacing:-.014em}h3{font-size:1.05rem}
+p{margin:0}a{color:var(--cyan)}
+.eyebrow{font-family:var(--mono);font-size:.67rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+.lede{font-size:clamp(1.04rem,2vw,1.2rem);color:var(--ink-2);line-height:1.55}
+.small{font-size:.88rem;color:var(--ink-2)}
+code{font-family:var(--mono);font-size:.85em;background:var(--surface-2);padding:.1em .36em;border-radius:4px}
+header{background:var(--surface);border-bottom:1px solid var(--rule);padding:clamp(30px,6vw,56px) 0 clamp(24px,4vw,38px)}
+header h1{margin:12px 0 16px}
+section{padding:clamp(38px,6vw,64px) 0;border-bottom:1px solid var(--rule-soft)}section:last-of-type{border:none}
+.stack{display:flex;flex-direction:column;gap:20px}
+.step{display:flex;align-items:baseline;gap:12px;margin-bottom:6px}
+.step b{font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;color:var(--accent);border:1px solid var(--rule);background:var(--surface);border-radius:999px;padding:3px 10px;white-space:nowrap}
+figure{margin:0;background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:18px;display:flex;flex-direction:column;gap:10px;box-shadow:var(--shadow)}
+figure svg{width:100%;height:auto;display:block;color:var(--ink)}
+figcaption{font-size:.87rem;color:var(--ink-2);line-height:1.55}figcaption b{color:var(--ink)}
+.note{border:1px solid var(--rule);border-left:2px solid var(--accent);background:var(--surface);border-radius:6px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.note h3{font-family:var(--mono);font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.note p,.note li{font-size:.9rem;color:var(--ink-2);line-height:1.55}.note ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px}
+.note.bad{border-left-color:var(--mag)}.note.bad h3{color:var(--mag)}
+.note.ok{border-left-color:var(--ok)}.note.ok h3{color:var(--ok)}
+.tscroll{overflow-x:auto;border:1px solid var(--rule);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:.87rem;min-width:520px}
+th,td{text-align:left;padding:9px 13px;border-bottom:1px solid var(--rule-soft)}
+thead th{font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:500;background:var(--surface-2)}
+tbody tr:last-child td{border:none}td.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.win{color:var(--ok);font-weight:600}.lose{color:var(--mag)}
+ol.tally{list-style:none;counter-reset:t;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+ol.tally li{counter-increment:t;display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:baseline;font-size:.92rem;color:var(--ink-2)}
+ol.tally li::before{content:counter(t);font-family:var(--mono);font-size:.7rem;color:var(--accent);border:1px solid var(--rule);width:22px;height:22px;display:grid;place-items:center;border-radius:50%}
+footer{padding:30px 0 50px;color:var(--ink-3);font-size:.84rem}
+@media (max-width:640px){body{font-size:16px}}
+</style>
+
+<header><div class="wrap">
+<p class="eyebrow">Plain-language walkthrough &middot; 17 Aug 2026</p>
+<h1>How We Got Here</h1>
+<p class="lede col">Six days, four species, about twenty experiments, and two moments where the result turned out to be the opposite of what we'd announced. This is the whole thing explained with pictures &mdash; what we asked, what we found, and where we were wrong.</p>
+</div></header>
+
+<main>
+
+<section><div class="wrap stack">
+<div class="step"><b>step 1</b><h2>The question we could actually answer</h2></div>
+<p class="lede col">The question we started with was <em>can a dog and a cat understand each other</em>. That isn't answerable &mdash; nobody can read meaning out of a sound. So we swapped it for one that is: <strong>given a recording, can a machine tell what situation the animal was in?</strong></p>
+<figure>
+<svg viewBox="0 0 780 190" role="img" aria-label="A sound is turned into 768 numbers by a frozen model; a small probe then reads either the animal's identity or the situation from those numbers.">
+<defs><marker id="ar1" markerWidth="9" markerHeight="9" refX="7" refY="3.2" orient="auto"><polygon points="0,0 7,3.2 0,6.4" fill="currentColor"/></marker></defs>
+<g font-family="ui-monospace,monospace" font-size="12" fill="currentColor">
+<rect x="14" y="62" width="112" height="52" rx="6" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<text x="70" y="84" text-anchor="middle">a meow</text><text x="70" y="101" text-anchor="middle" opacity=".6">1.8 s of audio</text>
+<line x1="128" y1="88" x2="182" y2="88" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar1)"/>
+<rect x="186" y="52" width="150" height="72" rx="6" fill="none" stroke="#0A626D" stroke-width="1.8"/>
+<text x="261" y="78" text-anchor="middle" fill="#0A626D">frozen model</text><text x="261" y="95" text-anchor="middle" opacity=".65">never retrained</text><text x="261" y="112" text-anchor="middle" opacity=".65">(WavLM, AVES&hellip;)</text>
+<line x1="338" y1="88" x2="392" y2="88" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar1)"/>
+<rect x="396" y="62" width="124" height="52" rx="6" fill="none" stroke="currentColor" stroke-width="1.4"/>
+<text x="458" y="84" text-anchor="middle">768 numbers</text><text x="458" y="101" text-anchor="middle" opacity=".6">the "embedding"</text>
+<line x1="522" y1="80" x2="576" y2="46" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar1)"/>
+<line x1="522" y1="96" x2="576" y2="130" stroke="currentColor" stroke-width="1.4" marker-end="url(#ar1)"/>
+<rect x="580" y="16" width="186" height="48" rx="6" fill="none" stroke="#8A3459" stroke-width="1.6"/>
+<text x="673" y="36" text-anchor="middle" fill="#8A3459">WHO is calling?</text><text x="673" y="53" text-anchor="middle" opacity=".7">which of 21 cats</text>
+<rect x="580" y="110" width="186" height="48" rx="6" fill="none" stroke="#0A626D" stroke-width="1.6"/>
+<text x="673" y="130" text-anchor="middle" fill="#0A626D">WHY is it calling?</text><text x="673" y="147" text-anchor="middle" opacity=".7">alone / being brushed</text>
+<text x="549" y="60" font-size="10.5" opacity=".65">probe</text>
+</g></svg>
+<figcaption><b>The setup.</b> A big pretrained model turns each sound into 768 numbers. We never retrain it &mdash; we just train a tiny classifier (a "probe") to read something out of those numbers. Crucially, we can point the same probe at two different questions: <em>who</em> is calling, or <em>why</em>. The gap between those two answers is the whole story.</figcaption>
+</figure>
+</div></section>
+
+<section><div class="wrap stack">
+<div class="step"><b>step 2</b><h2>The mistake everybody makes</h2></div>
+<p class="lede col">To test a model you split your recordings into a training half and a testing half. Almost everyone shuffles the clips at random. With animal recordings, that quietly breaks the test.</p>
+<figure>
+<svg viewBox="0 0 780 320" role="img" aria-label="Random splitting puts clips from the same cat in both training and test sets, letting the model recognise the cat instead of the situation; splitting by animal prevents this.">
+<g font-family="ui-monospace,monospace" font-size="11.5" fill="currentColor">
+<text x="14" y="20" font-size="13" fill="#8A3459">✗  RANDOM SPLIT &mdash; what most papers do</text>
+<rect x="14" y="32" width="350" height="98" rx="6" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55"/>
+<text x="26" y="50" opacity=".7">TRAIN</text>
+<rect x="404" y="32" width="350" height="98" rx="6" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55"/>
+<text x="416" y="50" opacity=".7">TEST</text>
+<g fill="#8A3459"><circle cx="60" cy="80" r="13"/><circle cx="104" cy="80" r="13"/><circle cx="148" cy="80" r="13"/><circle cx="450" cy="80" r="13"/><circle cx="494" cy="80" r="13"/></g>
+<g fill="#0A626D" opacity=".85"><circle cx="200" cy="80" r="13"/><circle cx="244" cy="80" r="13"/><circle cx="288" cy="80" r="13"/><circle cx="546" cy="80" r="13"/></g>
+<g fill="#FBFCFC" font-size="10" text-anchor="middle"><text x="60" y="84">🐱1</text><text x="104" y="84">🐱1</text><text x="148" y="84">🐱1</text><text x="450" y="84">🐱1</text><text x="494" y="84">🐱1</text><text x="200" y="84">🐱2</text><text x="244" y="84">🐱2</text><text x="288" y="84">🐱2</text><text x="546" y="84">🐱2</text></g>
+<path d="M148 100 C 250 148, 350 148, 450 100" fill="none" stroke="#8A3459" stroke-width="1.6" stroke-dasharray="4 3"/>
+<text x="300" y="152" text-anchor="middle" fill="#8A3459" font-size="11.5">same cat on both sides — the model can just recognise her voice</text>
+<text x="14" y="196" font-size="13" fill="#2C6349">✓  SPLIT BY ANIMAL — what we do</text>
+<rect x="14" y="208" width="350" height="88" rx="6" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55"/>
+<text x="26" y="226" opacity=".7">TRAIN</text>
+<rect x="404" y="208" width="350" height="88" rx="6" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".55"/>
+<text x="416" y="226" opacity=".7">TEST — a cat never heard before</text>
+<g fill="#8A3459"><circle cx="60" cy="258" r="13"/><circle cx="104" cy="258" r="13"/><circle cx="148" cy="258" r="13"/><circle cx="192" cy="258" r="13"/><circle cx="236" cy="258" r="13"/></g>
+<g fill="#0A626D" opacity=".85"><circle cx="450" cy="258" r="13"/><circle cx="494" cy="258" r="13"/><circle cx="538" cy="258" r="13"/><circle cx="582" cy="258" r="13"/></g>
+<g fill="#FBFCFC" font-size="10" text-anchor="middle"><text x="60" y="262">🐱1</text><text x="104" y="262">🐱1</text><text x="148" y="262">🐱1</text><text x="192" y="262">🐱1</text><text x="236" y="262">🐱1</text><text x="450" y="262">🐱2</text><text x="494" y="262">🐱2</text><text x="538" y="262">🐱2</text><text x="582" y="262">🐱2</text></g>
+<text x="640" y="290" text-anchor="middle" fill="#2C6349" font-size="11.5">no shortcut available</text>
+</g></svg>
+<figcaption><b>Shuffle the clips and the same cat appears on both sides of the test.</b> Recorded minutes apart, in the same room, sometimes the same session. The model can score well by recognising <em>her</em> rather than understanding the situation &mdash; and the score can't tell the difference. Splitting by whole animal removes the shortcut.</figcaption>
+</figure>
+<div class="note bad"><h3>What that costs, measured</h3>
+<p>Doing it the honest way drops reported accuracy by <b>10 to 24 points</b>, in every dataset and every feature set we tried. And when we asked the same numbers "which cat is this?", they answered correctly <b>79%</b> of the time &mdash; against a 5% chance rate. The shortcut isn't hypothetical; it's the loudest thing in the data.</p></div>
+</div></section>
+
+<section><div class="wrap stack">
+<div class="step"><b>step 3</b><h2>What that broke</h2></div>
+<div class="tscroll"><table>
+<thead><tr><th>what we measured</th><th class="num">shuffled</th><th class="num">honest</th><th>meaning</th></tr></thead>
+<tbody>
+<tr><td>cat situation (WavLM)</td><td class="num">0.725</td><td class="num">0.559</td><td>chance is 0.333</td></tr>
+<tr><td>pig emotion (WavLM)</td><td class="num">0.883</td><td class="num">0.660</td><td>chance is 0.500</td></tr>
+<tr><td>pig emotion (<b>2015 hand-made features</b>)</td><td class="num">0.823</td><td class="num" ><b class="win">0.669</b></td><td class="win">beats the AI model</td></tr>
+<tr><td>pig emotion (the corpus's own features)</td><td class="num">0.575</td><td class="num lose">0.386</td><td class="lose">below chance</td></tr>
+</tbody></table></div>
+<div class="note ok"><h3>The result that surprised us most</h3>
+<p>A set of <b>88 hand-designed sound measurements from 2015</b> matches a 95-million-parameter neural network on pig emotion &mdash; once you test honestly. Under the shuffled test the neural net looks 6 points ahead. That lead lives entirely inside the broken metric.</p></div>
+</div></section>
+
+<section><div class="wrap stack">
+<div class="step"><b>step 4</b><h2>The confidence numbers break the same way</h2></div>
+<p class="lede col">There's a statistical method that promises "these predictions are 90% reliable." We ran it. On average it delivered exactly that. Per animal, it didn't.</p>
+<figure>
+<svg viewBox="0 0 780 210" role="img" aria-label="Average coverage sits on the 90 percent target while individual cats range from 41 percent to near 100 percent, with five cats below the 80 percent line.">
+<g font-family="ui-monospace,monospace" font-size="11" fill="currentColor">
+<line x1="70" y1="150" x2="740" y2="150" stroke="currentColor" stroke-width="1" opacity=".45"/>
+<line x1="70" y1="40" x2="70" y2="150" stroke="currentColor" stroke-width="1" opacity=".45"/>
+<text x="62" y="46" text-anchor="end" opacity=".7">100%</text><text x="62" y="154" text-anchor="end" opacity=".7">40%</text>
+<line x1="70" y1="62" x2="740" y2="62" stroke="#2C6349" stroke-width="1.4" stroke-dasharray="5 4"/>
+<text x="746" y="66" fill="#2C6349" font-size="11">promised 90%</text>
+<line x1="70" y1="99" x2="740" y2="99" stroke="currentColor" stroke-width="1" stroke-dasharray="2 4" opacity=".5"/>
+<text x="746" y="103" opacity=".6" font-size="10.5">80%</text>
+<g fill="#0A626D"><circle cx="110" cy="150" r="5"/><circle cx="146" cy="121" r="5"/><circle cx="182" cy="112" r="5"/><circle cx="218" cy="104" r="5"/><circle cx="254" cy="96" r="5"/><circle cx="290" cy="88" r="5"/><circle cx="326" cy="80" r="5"/><circle cx="362" cy="74" r="5"/><circle cx="398" cy="68" r="5"/><circle cx="434" cy="64" r="5"/><circle cx="470" cy="60" r="5"/><circle cx="506" cy="56" r="5"/><circle cx="542" cy="53" r="5"/><circle cx="578" cy="50" r="5"/><circle cx="614" cy="48" r="5"/><circle cx="650" cy="46" r="5"/><circle cx="686" cy="44" r="5"/><circle cx="722" cy="43" r="5"/></g>
+<circle cx="110" cy="150" r="9" fill="none" stroke="#8A3459" stroke-width="1.8"/>
+<text x="110" y="176" text-anchor="middle" fill="#8A3459" font-size="11">41%</text>
+<text x="110" y="190" text-anchor="middle" fill="#8A3459" font-size="10" opacity=".8">worst cat</text>
+<rect x="150" y="163" width="196" height="20" rx="4" fill="#F2DEE7" stroke="none"/>
+<text x="248" y="177" text-anchor="middle" fill="#8A3459" font-size="10.5">5 of 20 cats below 80%</text>
+<text x="405" y="30" text-anchor="middle" font-size="12">each dot = one cat &nbsp;·&nbsp; average across all cats = <tspan fill="#2C6349">90.4% ✓</tspan></text>
+</g></svg>
+<figcaption><b>The headline number is perfect and one cat in five is far short.</b> Average coverage is 90.4% &mdash; exactly as promised. But the worst-served cat gets 41%, and five of twenty fall below 80%. Averages hide the animals the system fails.</figcaption>
+</figure>
+</div></section>
+
+<section><div class="wrap stack">
+<div class="step"><b>step 5</b><h2>Can we just delete the "who"?</h2></div>
+<p class="lede col">If identity is the problem, erase it. Picture the 768 numbers as a space you can move around in. Some directions in that space carry "which animal"; delete those directions and keep the rest.</p>
+<figure>
+<svg viewBox="0 0 780 250" role="img" aria-label="Two erasure methods: the first removes the most discriminative direction but leaves the class averages apart so a probe still works; the second moves the class averages on top of each other so no linear probe can separate them.">
+<g font-family="ui-monospace,monospace" font-size="11" fill="currentColor">
+<text x="14" y="18" font-size="12.5" fill="#8A3459">Method A &mdash; delete the "best separating" direction &nbsp;(what we tried first)</text>
+<ellipse cx="120" cy="86" rx="52" ry="26" fill="#0A626D" opacity=".18"/><ellipse cx="250" cy="86" rx="52" ry="26" fill="#8A3459" opacity=".18"/>
+<circle cx="120" cy="86" r="4" fill="#0A626D"/><circle cx="250" cy="86" r="4" fill="#8A3459"/>
+<text x="120" y="130" text-anchor="middle" fill="#0A626D">lab A</text><text x="250" y="130" text-anchor="middle" fill="#8A3459">lab B</text>
+<line x1="124" y1="86" x2="246" y2="86" stroke="currentColor" stroke-width="1.3" stroke-dasharray="3 3"/>
+<text x="185" y="78" text-anchor="middle" font-size="10.5">averages still apart</text>
+<text x="330" y="80" fill="#8A3459" font-size="12">→ a probe still finds it</text>
+<text x="330" y="98" fill="#8A3459" font-size="12">stuck at 82% (chance is 17%)</text>
+<line x1="14" y1="150" x2="766" y2="150" stroke="currentColor" stroke-width="1" opacity=".25"/>
+<text x="14" y="176" font-size="12.5" fill="#2C6349">Method B &mdash; move the two averages on top of each other &nbsp;(what worked)</text>
+<ellipse cx="185" cy="216" rx="52" ry="26" fill="#0A626D" opacity=".18"/><ellipse cx="185" cy="216" rx="52" ry="26" fill="#8A3459" opacity=".18"/>
+<circle cx="185" cy="216" r="4.5" fill="currentColor"/>
+<text x="185" y="252" text-anchor="middle" font-size="10.5">both averages, same point</text>
+<text x="330" y="210" fill="#2C6349" font-size="12">→ no straight line can separate them</text>
+<text x="330" y="228" fill="#2C6349" font-size="12">drops to 29% &mdash; the floor &mdash; using just 5 directions</text>
+</g></svg>
+<figcaption><b>Why our first attempt stalled, and the second didn't.</b> A probe separates two groups by drawing a line between their <em>averages</em>. Method A deletes the single most useful direction, but the averages stay apart, so a fresh probe just finds another angle. Method B (LEACE) moves the averages onto each other &mdash; the actual condition for a linear probe to fail. Five directions out of 768 were enough.</figcaption>
+</figure>
+<div class="note bad"><h3>Correction: we announced the opposite of this</h3>
+<p>Earlier in the week we published &mdash; here, in two commit messages, and in both repositories &mdash; that <em>"individual identity is removable but recording-site identity is not."</em> That second half is <b>false</b>. Site identity is removable, at rank 5. Our first method was simply the wrong tool, and we mistook its failure for a property of the data.</p></div>
+</div></section>
+
+<section><div class="wrap stack">
+<div class="step"><b>step 6</b><h2>But it comes back</h2></div>
+<p class="lede col">After erasing the site information, a straight-line probe genuinely can't find it. A slightly cleverer one can &mdash; 92% of the time. Here's what it's seeing.</p>
+<figure>
+<svg viewBox="0 0 780 230" role="img" aria-label="After erasure the two groups share the same average but have differently shaped spreads, so a curved boundary can still separate them even though a straight line cannot.">
+<g font-family="ui-monospace,monospace" font-size="11" fill="currentColor">
+<ellipse cx="200" cy="112" rx="88" ry="30" fill="#0A626D" opacity=".2"/>
+<ellipse cx="200" cy="112" rx="30" ry="80" fill="#8A3459" opacity=".2"/>
+<circle cx="200" cy="112" r="4.5" fill="currentColor"/>
+<text x="200" y="212" text-anchor="middle" font-size="11">same centre, different shapes</text>
+<text x="316" y="96" fill="#0A626D" font-size="11.5">lab A spreads sideways</text>
+<text x="316" y="130" fill="#8A3459" font-size="11.5">lab B spreads up and down</text>
+<line x1="200" y1="26" x2="200" y2="198" stroke="currentColor" stroke-width="1.5" stroke-dasharray="5 4" opacity=".75"/>
+<text x="208" y="36" font-size="10.5" opacity=".75">any straight line fails →</text>
+<path d="M470 200 Q 560 112 470 26" fill="none" stroke="#8A3459" stroke-width="2"/>
+<text x="486" y="118" fill="#8A3459" font-size="11.5">a curved boundary</text>
+<text x="486" y="134" fill="#8A3459" font-size="11.5">still works: 92%</text>
+<rect x="600" y="70" width="166" height="84" rx="6" fill="none" stroke="currentColor" stroke-width="1.2" opacity=".5"/>
+<text x="683" y="94" text-anchor="middle" font-size="11">lab covariances differ</text>
+<text x="683" y="112" text-anchor="middle" font-size="11">from pooled by</text>
+<text x="683" y="132" text-anchor="middle" font-size="13" fill="#8A3459">59–115%</text>
+</g></svg>
+<figcaption><b>The leak is in the <em>shape</em>, not the position.</b> Erasure equalises where each lab's data sits, but not how it's spread out &mdash; and every method we tried (including the trained adversarial network) only fixes position. The one method that fixes shape destroys the actual task. This also explains, cleanly, why the neural approach failed.</figcaption>
+</figure>
+</div></section>
+
+<section><div class="wrap stack">
+<div class="step"><b>step 7</b><h2>The pattern we didn't expect</h2></div>
+<p class="lede col">Five separate times, the simple option beat the sophisticated one &mdash; but only once we tested honestly.</p>
+<ol class="tally">
+<li>88 hand-made features from 2015 <b>matched</b> a 95M-parameter neural network on pig emotion.</li>
+<li>Slowing bat recordings down 4× <b>beat</b> a purpose-built multi-band method from a published paper.</li>
+<li>A 30-line linear projection <b>beat</b> a trained adversarial neural network at removing identity &mdash; 2–3× more removed, and it damaged the task less.</li>
+<li>Using <b>no pitch feature at all</b> beat every pitch-based idea we had, including our own flagship one.</li>
+<li>A closed-form formula <b>beat</b> the iterative method it replaced, reaching the floor in 5 steps where the other stalled forever at 32+.</li>
+</ol>
+<div class="note"><h3>Why this keeps happening</h3>
+<p>It isn't that complexity is bad. It's that the shuffled test <em>rewards</em> models that memorise the animal, and big models memorise better than small ones. Remove the shortcut and the advantage largely disappears. The sophistication was buying performance on the wrong task.</p></div>
+</div></section>
+
+<section><div class="wrap stack">
+<div class="step"><b>step 8</b><h2>What we got wrong</h2></div>
+<p class="lede col">Three claims we made confidently and then had to withdraw. Keeping the list is the point &mdash; if the project is about honest evaluation, it has to survive its own standard.</p>
+<div class="note bad"><h3>Withdrawn</h3><ul>
+<li><b>"Site identity can't be removed."</b> It can, at rank 5, in closed form. We'd used the wrong method and blamed the data.</li>
+<li><b>"Body-size-normalised pitch will transfer across species."</b> It doesn't &mdash; and it can't, because the pitch–emotion relationship <em>flips sign</em> between pigs and the others. Rescaling can't reverse a sign. That was a reasoning error, not a data problem.</li>
+<li><b>"Half the cross-species effect is call duration."</b> Removing duration barely dented it. Duration is a parallel cue, not the mechanism.</li>
+</ul></div>
+<div class="note bad"><h3>Also caught before it shipped</h3><ul>
+<li>Two references pointed at the <b>wrong paper</b>, and one credited the <b>wrong researcher</b> &mdash; two people with similar surnames.</li>
+<li>The two most damning quotes in the paper were <b>uncited and from a different paper</b> than we thought.</li>
+<li>Five editorial notes &mdash; including literally <code>VERIFY before submission</code> &mdash; would have been <b>typeset into the bibliography</b> of a double-blind submission.</li>
+<li>A protocol bug in our own earlier code produced a coverage number <b>below chance</b>, which is impossible and revealed the flaw.</li>
+</ul></div>
+</div></section>
+
+<section><div class="wrap stack">
+<div class="step"><b>step 9</b><h2>What it all adds up to</h2></div>
+<div class="note ok"><h3>The one-sentence version</h3>
+<p>Across cats, dogs, pigs and wild bats, the AI models the field relies on are answering <b>"who is this and where was it recorded?"</b> while being graded as though they answered <b>"what is happening?"</b> &mdash; and the fix costs one extra number in your results table.</p></div>
+<p class="col">The recommendation is small and cheap: split your data by animal or by site, never at random; and report how well your features identify the <em>animal</em> right next to how well they identify the <em>behaviour</em>. If the first number is high, the second is borrowing from it.</p>
+<p class="col small">Everything here ran on a laptop with no GPU. Total compute cost: $0. Every number traces to a script in the repository, and the results that didn't work are written down next to the ones that did.</p>
+</div></section>
+</main>
+<footer><div class="wrap"><p>Companion to the full findings and the paper draft. Data: CatMeows (Ludovico et al. 2021), dog barks (Moln&aacute;r et al. 2008), Soundwel (Briefer et al. 2022), Egyptian fruit bats (Prat et al. 2017).</p></div></footer>
